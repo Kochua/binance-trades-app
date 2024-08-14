@@ -1,134 +1,44 @@
-import { LimitModal } from "@/components/LimitModal";
-import { MessageModal } from "@/components/MessageModal";
-import { ThemedView } from "@/components/ThemedView";
-import { calculateAveragePrice, getHourAndMinute } from "@/helpers";
-import useTrades, { Trade } from "@/hooks/useTrades";
-import React, { useState, useEffect, useCallback } from "react";
-import { FlatList, Text, View, StyleSheet, Button } from "react-native";
+import { Tabs } from "expo-router";
+import React from "react";
 
-const BinanceSocketScreen = () => {
-  const { trades, currentPrice } = useTrades();
+import { TabBarIcon } from "@/components/navigation/TabBarIcon";
+import { Colors } from "@/constants/Colors";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
-  const [limitVisible, setLimitVisible] = useState(false);
-  const [messageVisible, setMessageVisible] = useState(false);
-  const [message, setMessage] = useState("");
-
-  const [lowerLimit, setLowerLimit] = useState<number | null>(null);
-  const [upperLimit, setUpperLimit] = useState<number | null>(null);
-
-  const averagePrices = calculateAveragePrice(trades);
-
-  const handleSelect = (lowerLimit: number, upperLimit: number) => {
-    setLowerLimit(lowerLimit);
-    setUpperLimit(upperLimit);
-  };
-
-  useEffect(() => {
-    if (!lowerLimit || !upperLimit || messageVisible) return;
-
-    if (lowerLimit > currentPrice) {
-      setMessageVisible(true);
-      setMessage("Lower limit is too low");
-
-      return;
-    }
-
-    if (currentPrice > upperLimit) {
-      setMessageVisible(true);
-      setMessage("Higher limit is too high");
-      return;
-    }
-  }, [currentPrice, lowerLimit, upperLimit]);
-
-  const dataToRender = Object.keys(trades).map((minute) => ({
-    minute,
-    data: trades[minute],
-  }));
-  const renderGroup = ({
-    item,
-  }: {
-    item: {
-      minute: string;
-      data: Trade[];
-    };
-  }) => {
-    const { hour, minute } = getHourAndMinute(new Date(item.minute));
-    return (
-      <View style={{}}>
-        <View style={{ borderTopWidth: 1, paddingVertical: 15 }}>
-          <Text style={{ fontSize: 20 }}>
-            Time: {hour}:{minute} minutes
-          </Text>
-          <Text style={{ fontSize: 20 }}>
-            Average price: {averagePrices[minute]}
-          </Text>
-        </View>
-
-        <View style={{ paddingLeft: 20 }}>
-          {item.data.reverse().map((trade, index) => (
-            <View style={{ marginBottom: 12 }} key={trade.t}>
-              <Text style={{ fontSize: 16 }}>
-                Time: {hour}:{minute}
-              </Text>
-              <Text style={{ fontSize: 16 }}>
-                Price: {trade.p}, Quantity: {trade.q}
-              </Text>
-            </View>
-          ))}
-        </View>
-      </View>
-    );
-  };
+export default function TabLayout() {
+  const colorScheme = useColorScheme();
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={{ marginVertical: 20 }}>
-        <Button title="Set Limits" onPress={() => setLimitVisible(true)} />
-
-        <Text style={{ marginLeft: 20, fontSize: 16 }}>
-          Current Price: {currentPrice}
-        </Text>
-        <Text style={{ marginLeft: 20, fontSize: 16 }}>
-          Lower Limit: {lowerLimit}
-        </Text>
-        <Text style={{ marginLeft: 20, fontSize: 16 }}>
-          Upper Limit: {upperLimit}
-        </Text>
-      </View>
-      <FlatList
-        data={dataToRender}
-        keyExtractor={(item) => item.minute}
-        renderItem={renderGroup}
-        initialNumToRender={10}
-        windowSize={5}
-        removeClippedSubviews={true}
-      />
-
-      <LimitModal
-        visible={limitVisible}
-        setVisible={setLimitVisible}
-        onSelect={handleSelect}
-      />
-
-      <MessageModal
-        visible={messageVisible}
-        setVisible={() => {
-          setLowerLimit(null);
-          setUpperLimit(null);
-          setMessageVisible(false);
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        headerShown: false,
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Trades",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "home" : "home-outline"}
+              color={color}
+            />
+          ),
         }}
-        message={message}
       />
-    </ThemedView>
+      <Tabs.Screen
+        name="explore"
+        options={{
+          title: "Grouped Trades",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "code-slash" : "code-slash-outline"}
+              color={color}
+            />
+          ),
+        }}
+      />
+    </Tabs>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    marginTop: 50,
-  },
-});
-
-export default BinanceSocketScreen;
+}

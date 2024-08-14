@@ -22,31 +22,56 @@ export const LimitModal: FC<LimitModalProps> = memo(
     };
 
     return (
-      <View>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Modal visible={visible} animationType="slide">
           <View
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              marginTop: "30%",
-            }}
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
           >
-            <Text>Lower Limit:</Text>
-            <TextInput
-              value={input1}
-              onChangeText={setInput1}
-              style={{ height: 40, borderWidth: 1, width: "50%" }}
-            />
+            <Text style={{ fontSize: 20, marginBottom: 20 }}>Enter Limits</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 10,
+              }}
+            >
+              <Text style={{ marginRight: 10 }}>Lower Limit:</Text>
+              <TextInput
+                value={input1}
+                onChangeText={setInput1}
+                style={{
+                  height: 40,
+                  borderWidth: 1,
+                  width: "50%",
+                  paddingHorizontal: 10,
+                }}
+              />
+            </View>
 
-            <Text>Upper Limit:</Text>
-            <TextInput
-              value={input2}
-              onChangeText={setInput2}
-              style={{ height: 40, borderWidth: 1, width: "50%" }}
-            />
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 20,
+              }}
+            >
+              <Text style={{ marginRight: 10 }}>Upper Limit:</Text>
+              <TextInput
+                value={input2}
+                onChangeText={setInput2}
+                style={{
+                  height: 40,
+                  borderWidth: 1,
+                  width: "50%",
+                  paddingHorizontal: 10,
+                }}
+              />
+            </View>
 
-            <Button title="Save" onPress={handleSave} />
-            <Button title="Cancel" onPress={handleCloseModal} />
+            <View style={{ flexDirection: "row" }}>
+              <Button title="Save" onPress={handleSave} />
+              <Button title="Cancel" onPress={handleCloseModal} />
+            </View>
           </View>
         </Modal>
       </View>
